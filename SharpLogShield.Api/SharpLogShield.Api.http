@@ -1,0 +1,6 @@
+@SharpLogShield.Api_HostAddress = http://localhost:5053
+
+GET {{SharpLogShield.Api_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
