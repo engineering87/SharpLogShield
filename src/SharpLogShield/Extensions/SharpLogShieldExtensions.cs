@@ -1,6 +1,8 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
-using SharpLogShield.Providers;
+using Microsoft.Extensions.Options;
+using SharpLogShield.Factories;
 
 namespace SharpLogShield.Extensions
 {
@@ -8,13 +10,16 @@ namespace SharpLogShield.Extensions
     {
         public static ILoggingBuilder AddSharpLogShieldLogging(this ILoggingBuilder builder)
         {
-            builder.Services.AddSingleton<ILoggerProvider>(serviceProvider =>
+            builder.Services.Replace(ServiceDescriptor.Singleton<ILoggerFactory>(sp =>
             {
-                var innerProvider = serviceProvider.GetRequiredService<ILoggerProvider>();
-                return new SharpLogShieldLoggerProvider(innerProvider);
-            });
+                var providers = sp.GetServices<ILoggerProvider>();
+                var loggerOptions = sp.GetRequiredService<IOptionsMonitor<LoggerFilterOptions>>();
+                var factoryOptions = sp.GetRequiredService<IOptions<LoggerFactoryOptions>>();
 
-            //builder.Services.AddSingleton<ILoggerProvider, SharpLogShieldLoggerProvider>();
+                var originalFactory = new LoggerFactory(providers, loggerOptions, factoryOptions);
+
+                return new SharpLogShieldFactory(originalFactory);
+            }));
 
             return builder;
         }

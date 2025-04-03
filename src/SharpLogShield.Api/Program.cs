@@ -2,15 +2,20 @@ using SharpLogShield.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Logging.ClearProviders(); // Rimuovi tutti i provider di logging predefiniti
-builder.Logging.AddSharpLogShieldLogging();
-
 // Add services to the container.
 builder.Services.AddControllers();
 
 // Aggiungi OpenAPI e Swagger UI
 builder.Services.AddEndpointsApiExplorer();  // Necessario per OpenAPI
 builder.Services.AddSwaggerGen();            // Aggiunge il supporto per la generazione della documentazione Swagger
+
+// Aggiungi Logging
+builder.Services.AddLogging(loggingBuilder =>
+{
+    loggingBuilder.ClearProviders();
+    loggingBuilder.AddConsole();
+    loggingBuilder.AddSharpLogShieldLogging();
+});
 
 var app = builder.Build();
 
